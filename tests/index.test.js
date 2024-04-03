@@ -1,17 +1,27 @@
-// tests/index.test.js
+test('Execute SQL Query with INNER JOIN', async () => {
+    // Ensure that student.csv and enrollment.csv exist
+    expect(fs.existsSync(studentCSV)).toBe(true);
+    expect(fs.existsSync(enrollmentCSV)).toBe(true);
 
-test('Execute SQL Query with Greater Than', async () => {
-    const queryWithGT = 'SELECT id FROM sample WHERE age > 22';
-    const result = await executeSELECTQuery(queryWithGT);
-    expect(result.length).toEqual(2);
-    expect(result[0]).toHaveProperty('id');
+    const query = 'SELECT student.id, student.name, enrollment.course FROM student INNER JOIN enrollment ON student.id = enrollment.student_id';
+    const result = await executeSELECTQuery(query);
+
+    // Write assertions based on the expected data in your CSV files
+    expect(result.length).toEqual(4); // Assuming there are 4 records in the joined data
+    expect(result[0]).toHaveProperty('student.id');
+    expect(result[0]).toHaveProperty('student.name');
+    expect(result[0]).toHaveProperty('enrollment.course');
 });
 
-test('Execute SQL Query with Not Equal to', async () => {
-    const queryWithNEQ = 'SELECT name FROM sample WHERE age != 25';
-    const result = await executeSELECTQuery(queryWithNEQ);
-    expect(result.length).toEqual(2);
-    expect(result[0]).toHaveProperty('name');
-});
+test('Execute SQL Query with INNER JOIN and a WHERE Clause', async () => {
+    // Ensure that student.csv and enrollment.csv exist
+    expect(fs.existsSync(studentCSV)).toBe(true);
+    expect(fs.existsSync(enrollmentCSV)).toBe(true);
 
-// Add more test cases as needed for other comparison operators
+    const query = 'SELECT student.name, enrollment.course FROM student INNER JOIN enrollment ON student.id = enrollment.student_id WHERE student.name = "John"';
+    const result = await executeSELECTQuery(query);
+
+    // Write assertions based on the expected filtered data
+    expect(result.length).toEqual(2); // Assuming there are 2 records matching the WHERE clause
+    expect(result[0]).toHaveProperty('student.name', 'John');
+});
