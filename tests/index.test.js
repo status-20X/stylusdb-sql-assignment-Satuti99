@@ -9,3 +9,16 @@ test('Read CSV File', async () => {
     expect(data[0].name).toBe('John');
     expect(data[0].age).toBe('30'); //ignore the string type here, we will fix this later
 });
+
+// tests/index.test.js
+
+const parseQuery = require('../src/queryParser');
+
+test('Parse SQL Query', () => {
+    const query = 'SELECT id, name FROM sample';
+    const parsed = parseQuery(query);
+    expect(parsed).toEqual({
+        fields: ['id', 'name'],
+        table: 'sample'
+    });
+});
