@@ -1,7 +1,7 @@
 /*
 Creating a Query Parser which can parse SQL `SELECT` Queries only.
 // */
-function parseSelectQuery(query) {
+function parseQuery(query) {
     try {
 
         // Trim the query to remove any leading/trailing whitespaces
@@ -100,9 +100,10 @@ function checkAggregateWithoutGroupBy(query, groupByFields) {
 }
 
 function parseWhereClause(whereString) {
-    const conditionRegex = /(.*?)(=|!=|>=|<=|>|<)(.*)/;
+    const conditionRegex = /(.*?)(=|!=|>|<|>=|<=)(.*)/;
     return whereString.split(/ AND | OR /i).map(conditionString => {
         if (conditionString.includes(' LIKE ')) {
+            console.log(conditionString);
             const [field, pattern] = conditionString.split(/\sLIKE\s/i);
             return { field: field.trim(), operator: 'LIKE', value: pattern.trim().replace(/^'(.*)'$/, '$1') };
         } else {
@@ -138,43 +139,4 @@ function parseJoinClause(query) {
     };
 }
 
-function parseInsertQuery(query) {
-    const insertRegex = /INSERT INTO (\w+)\s\((.+)\)\sVALUES\s\((.+)\)/i;
-    const match = query.match(insertRegex);
-
-    if (!match) {
-        throw new Error("Invalid INSERT INTO syntax.");
-    }
-
-    const [, table, columns, values] = match;
-    return {
-        type: 'INSERT',
-        table: table.trim(),
-        columns: columns.split(',').map(column => column.trim()),
-        values: values.split(',').map(value => value.trim())
-    };
-}
-
-function parseDeleteQuery(query) {
-    const deleteRegex = /DELETE FROM (\w+)( WHERE (.*))?/i;
-    const match = query.match(deleteRegex);
-
-    if (!match) {
-        throw new Error("Invalid DELETE syntax.");
-    }
-
-    const [, table, , whereString] = match;
-    let whereClauses = [];
-    if (whereString) {
-        whereClauses = parseWhereClause(whereString);
-    }
-
-    return {
-        type: 'DELETE',
-        table: table.trim(),
-        whereClauses
-    };
-}
-
-
-module.exports = { parseSelectQuery, parseJoinClause, parseInsertQuery, parseDeleteQuery };
+module.exports = { parseQuery, parseJoinClause };
